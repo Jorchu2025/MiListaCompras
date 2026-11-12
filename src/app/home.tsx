@@ -1,20 +1,66 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
-
+import * as Notifications from 'expo-notifications';
 
 import { Link, useRouter } from 'expo-router';
 import { useEffect, useState } from 'react';
-import { StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import {
+  Platform,
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View
+} from 'react-native';
 import ProductItem from '../components/ProductItem';
 
 
-
-
-
+Notifications.setNotificationHandler({
+  handleNotification: async () => ({
+    shouldShowBanner: true,
+    shouldShowList: true,
+    shouldPlaySound: false,
+    shouldSetBadge: false,
+  }),
+});
 
 export default function HomeScreen() {
   const router = useRouter();
   const [productos, setProductos] = useState<string[]>([]);
   const [busqueda, setBusqueda] = useState('');
+
+
+  const handleNotification = async () => {
+  if (Platform.OS === 'android') {
+    await Notifications.setNotificationChannelAsync('default', {
+      name: 'default',
+      importance: Notifications.AndroidImportance.MAX,
+    });
+  }
+
+  const { status: existingStatus } =
+    await Notifications.getPermissionsAsync();
+
+  let finalStatus = existingStatus;
+
+  if (existingStatus !== 'granted') {
+    const { status } =
+      await Notifications.requestPermissionsAsync();
+
+    finalStatus = status;
+  }
+
+  if (finalStatus !== 'granted') {
+    return;
+  }
+
+  await Notifications.scheduleNotificationAsync({
+    content: {
+      title: '🛒 Mi Lista de Compras',
+      body: 'Recordá revisar tu lista de compras.',
+    },
+    trigger: null,
+  });
+};
 
   
 
@@ -97,6 +143,15 @@ return (
         }}
       />
     ))}
+
+<TouchableOpacity
+  style={styles.logoutButton}
+  onPress={handleNotification}
+>
+  <Text style={styles.logoutButtonText}>
+    🔔 PROBAR NOTIFICACIÓN
+  </Text>
+</TouchableOpacity>
 
 
 
