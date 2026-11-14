@@ -1,5 +1,6 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
+import * as ImagePicker from 'expo-image-picker';
 import { Link } from 'expo-router';
 import { useState } from 'react';
 import { StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
@@ -7,6 +8,29 @@ import { StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-nativ
 export default function AddProductScreen() {
 
 const [producto, setProducto] = useState('');
+const [imagenUri, setImagenUri] = useState<string | null>(null);
+
+
+
+const seleccionarImagen = async () => {
+  const permiso = await ImagePicker.requestMediaLibraryPermissionsAsync();
+
+  if (!permiso.granted) {
+    alert('Necesitamos permiso para acceder a la galería.');
+    return;
+  }
+
+  const resultado = await ImagePicker.launchImageLibraryAsync({
+    mediaTypes: ['images'],
+    allowsEditing: true,
+    quality: 1,
+  });
+
+  if (!resultado.canceled) {
+  setImagenUri(resultado.assets[0].uri);
+}
+
+
 
 const handleAddProduct = async () => {
 
@@ -17,7 +41,12 @@ const handleAddProduct = async () => {
     ? JSON.parse(productosGuardados)
     : [];
 
-  productos.push(producto);
+  productos.push({
+  nombre: producto,
+  imagen: imagenUri,
+});
+
+
 
   await AsyncStorage.setItem('productos', JSON.stringify(productos));
 };
@@ -53,6 +82,19 @@ const handleAddProduct = async () => {
     AGREGAR
   </Text>
   </TouchableOpacity>
+
+
+<TouchableOpacity
+  style={styles.addButton}
+  onPress={seleccionarImagen}
+>
+  <Text style={styles.addButtonText}>
+    🖼️ SELECCIONAR FOTO
+  </Text>
+</TouchableOpacity>
+
+
+
 
       <Link href="/home" asChild>
         <TouchableOpacity>
@@ -131,4 +173,4 @@ const styles = StyleSheet.create({
     marginTop: 25,
   },
 });
-
+}

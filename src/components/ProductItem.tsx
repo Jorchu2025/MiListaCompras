@@ -1,16 +1,32 @@
-import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import {
+  Image,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from 'react-native';
+
+
 
 type ProductItemProps = {
   producto: string;
+  imagen?: string | null;
   onDelete: () => void;
 };
 
-export default function ProductItem({
-  producto,
-  onDelete,
-}: ProductItemProps) {
+
+export default function ProductItem({ producto, imagen, onDelete }: ProductItemProps) {
   return (
     <View style={styles.productCard}>
+
+
+      {imagen && (
+    <Image
+      source={{ uri: imagen }}
+      style={styles.productImage}
+    />
+  )}
+
       <Text style={styles.productName}>
         🛒 {producto}
       </Text>
@@ -23,6 +39,13 @@ export default function ProductItem({
 }
 
 const styles = StyleSheet.create({
+productImage: {
+  width: 60,
+  height: 60,
+  borderRadius: 10,
+  marginRight: 12,
+},
+
   productCard: {
     backgroundColor: '#FFFFFF',
     padding: 16,

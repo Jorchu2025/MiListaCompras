@@ -25,7 +25,12 @@ Notifications.setNotificationHandler({
 
 export default function HomeScreen() {
   const router = useRouter();
-  const [productos, setProductos] = useState<string[]>([]);
+  type Producto = {
+  nombre: string;
+  imagen: string | null;
+};
+
+const [productos, setProductos] = useState<Producto[]>([]);
   const [busqueda, setBusqueda] = useState('');
 
 
@@ -89,8 +94,17 @@ const handleLogout = async () => {
       const productosGuardados = await AsyncStorage.getItem('productos');
 
       if (productosGuardados) {
-        setProductos(JSON.parse(productosGuardados));
-      }
+  const datos = JSON.parse(productosGuardados);
+
+  const productosConvertidos = datos.map(
+    (producto: string | Producto) =>
+      typeof producto === 'string'
+        ? { nombre: producto, imagen: null }
+        : producto
+  );
+
+  setProductos(productosConvertidos);
+}
     };
 
     cargarProductos();
@@ -110,7 +124,7 @@ const handleLogout = async () => {
 };
 
 const productosFiltrados = productos.filter((producto) =>
-  producto.toLowerCase().includes(busqueda.toLowerCase())
+  producto.nombre.toLowerCase().includes(busqueda.toLowerCase())
 );
 
 return (
@@ -135,14 +149,16 @@ return (
 
     {productosFiltrados.map((producto) => (
       <ProductItem
-        key={producto}
-        producto={producto}
+  key={producto.nombre}
+  producto={producto.nombre}
+  imagen={producto.imagen}
         onDelete={() => {
           const indexOriginal = productos.indexOf(producto);
           handleDeleteProduct(indexOriginal);
         }}
       />
     ))}
+
 
 <TouchableOpacity
   style={styles.logoutButton}
