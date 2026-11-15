@@ -28,7 +28,13 @@ export default function HomeScreen() {
   type Producto = {
   nombre: string;
   imagen: string | null;
+  ubicacion: {
+    latitude: number;
+    longitude: number;
+  } | null;
 };
+
+
 
 const [productos, setProductos] = useState<Producto[]>([]);
   const [busqueda, setBusqueda] = useState('');
@@ -152,6 +158,7 @@ return (
   key={producto.nombre}
   producto={producto.nombre}
   imagen={producto.imagen}
+  ubicacion={producto.ubicacion}
         onDelete={() => {
           const indexOriginal = productos.indexOf(producto);
           handleDeleteProduct(indexOriginal);

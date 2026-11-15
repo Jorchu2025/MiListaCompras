@@ -7,15 +7,22 @@ import {
 } from 'react-native';
 
 
-
 type ProductItemProps = {
   producto: string;
   imagen?: string | null;
+  ubicacion?: {
+    latitude: number;
+    longitude: number;
+  } | null;
   onDelete: () => void;
 };
 
-
-export default function ProductItem({ producto, imagen, onDelete }: ProductItemProps) {
+export default function ProductItem({
+  producto,
+  imagen,
+  ubicacion,
+  onDelete,
+}: ProductItemProps) {
   return (
     <View style={styles.productCard}>
 
@@ -30,6 +37,13 @@ export default function ProductItem({ producto, imagen, onDelete }: ProductItemP
       <Text style={styles.productName}>
         🛒 {producto}
       </Text>
+
+{ubicacion && (
+  <Text style={styles.locationText}>
+    📍 {ubicacion.latitude.toFixed(5)}, {ubicacion.longitude.toFixed(5)}
+  </Text>
+)}
+
 
       <TouchableOpacity onPress={onDelete}>
         <Text style={styles.deleteButton}>🗑</Text>
@@ -46,6 +60,11 @@ productImage: {
   marginRight: 12,
 },
 
+locationText: {
+  fontSize: 12,
+  color: '#7A9B8A',
+  marginTop: 4,
+},
   productCard: {
     backgroundColor: '#FFFFFF',
     padding: 16,

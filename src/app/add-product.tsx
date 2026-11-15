@@ -1,6 +1,7 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 import * as ImagePicker from 'expo-image-picker';
+import * as Location from 'expo-location';
 import { Link } from 'expo-router';
 import { useState } from 'react';
 import { StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
@@ -9,6 +10,11 @@ export default function AddProductScreen() {
 
 const [producto, setProducto] = useState('');
 const [imagenUri, setImagenUri] = useState<string | null>(null);
+const [ubicacion, setUbicacion] = useState<{
+  latitude: number;
+  longitude: number;
+} | null>(null);
+
 
 
 
@@ -19,6 +25,25 @@ const seleccionarImagen = async () => {
     alert('Necesitamos permiso para acceder a la galería.');
     return;
   }
+
+
+  const obtenerUbicacion = async () => {
+  const permiso = await Location.requestForegroundPermissionsAsync();
+
+  if (permiso.status !== 'granted') {
+    alert('Necesitamos permiso para acceder a tu ubicación.');
+    return;
+  }
+
+  const posicion = await Location.getCurrentPositionAsync({});
+
+  setUbicacion({
+    latitude: posicion.coords.latitude,
+    longitude: posicion.coords.longitude,
+  });
+};
+
+
 
   const resultado = await ImagePicker.launchImageLibraryAsync({
     mediaTypes: ['images'],
@@ -46,6 +71,11 @@ const handleAddProduct = async () => {
   imagen: imagenUri,
 });
 
+productos.push({
+  nombre: producto,
+  imagen: imagenUri,
+  ubicacion: ubicacion,
+});
 
 
   await AsyncStorage.setItem('productos', JSON.stringify(productos));
@@ -93,6 +123,22 @@ const handleAddProduct = async () => {
   </Text>
 </TouchableOpacity>
 
+<TouchableOpacity
+  style={styles.addButton}
+  onPress={obtenerUbicacion}
+>
+  <Text style={styles.addButtonText}>
+    📍 OBTENER UBICACIÓN
+  </Text>
+</TouchableOpacity>
+
+{ubicacion && (
+  <Text style={styles.locationText}>
+    📍 Latitud: {ubicacion.latitude}
+    {'\n'}
+    Longitud: {ubicacion.longitude}
+  </Text>
+)}
 
 
 
@@ -165,6 +211,13 @@ const styles = StyleSheet.create({
     fontSize: 15,
     fontWeight: 'bold',
   },
+
+locationText: {
+  marginTop: 12,
+  textAlign: 'center',
+  color: '#7A9B8A',
+  fontSize: 14,
+},
 
   backText: {
     textAlign: 'center',
