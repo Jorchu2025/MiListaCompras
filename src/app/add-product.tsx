@@ -1,92 +1,83 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
-
 import * as ImagePicker from 'expo-image-picker';
 import * as Location from 'expo-location';
 import { Link } from 'expo-router';
 import { useState } from 'react';
-import { StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import {
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
+} from 'react-native';
 
 export default function AddProductScreen() {
+  const [producto, setProducto] = useState('');
+  const [imagenUri, setImagenUri] = useState<string | null>(null);
 
-const [producto, setProducto] = useState('');
-const [imagenUri, setImagenUri] = useState<string | null>(null);
-const [ubicacion, setUbicacion] = useState<{
-  latitude: number;
-  longitude: number;
-} | null>(null);
+  const [ubicacion, setUbicacion] = useState<{
+    latitude: number;
+    longitude: number;
+  } | null>(null);
 
+  const seleccionarImagen = async () => {
+    const permiso =
+      await ImagePicker.requestMediaLibraryPermissionsAsync();
 
+    if (!permiso.granted) {
+      alert('Necesitamos permiso para acceder a la galería.');
+      return;
+    }
 
+    const resultado = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ['images'],
+      allowsEditing: true,
+      quality: 1,
+    });
 
-const seleccionarImagen = async () => {
-  const permiso = await ImagePicker.requestMediaLibraryPermissionsAsync();
-
-  if (!permiso.granted) {
-    alert('Necesitamos permiso para acceder a la galería.');
-    return;
-  }
-
+    if (!resultado.canceled) {
+      setImagenUri(resultado.assets[0].uri);
+    }
+  };
 
   const obtenerUbicacion = async () => {
-  const permiso = await Location.requestForegroundPermissionsAsync();
+    const permiso = await Location.requestForegroundPermissionsAsync();
 
-  if (permiso.status !== 'granted') {
-    alert('Necesitamos permiso para acceder a tu ubicación.');
-    return;
-  }
+    if (permiso.status !== 'granted') {
+      alert('Necesitamos permiso para acceder a tu ubicación.');
+      return;
+    }
 
-  const posicion = await Location.getCurrentPositionAsync({});
+    const posicion = await Location.getCurrentPositionAsync({});
 
-  setUbicacion({
-    latitude: posicion.coords.latitude,
-    longitude: posicion.coords.longitude,
-  });
-};
+    setUbicacion({
+      latitude: posicion.coords.latitude,
+      longitude: posicion.coords.longitude,
+    });
+  };
 
+  const handleAddProduct = async () => {
+    const productosGuardados =
+      await AsyncStorage.getItem('productos');
 
+    const productos = productosGuardados
+      ? JSON.parse(productosGuardados)
+      : [];
 
-  const resultado = await ImagePicker.launchImageLibraryAsync({
-    mediaTypes: ['images'],
-    allowsEditing: true,
-    quality: 1,
-  });
+    productos.push({
+      nombre: producto,
+      imagen: imagenUri,
+      ubicacion: ubicacion,
+    });
 
-  if (!resultado.canceled) {
-  setImagenUri(resultado.assets[0].uri);
-}
-
-
-
-const handleAddProduct = async () => {
-
-
-  const productosGuardados = await AsyncStorage.getItem('productos');
-
-  const productos = productosGuardados
-    ? JSON.parse(productosGuardados)
-    : [];
-
-  productos.push({
-  nombre: producto,
-  imagen: imagenUri,
-});
-
-productos.push({
-  nombre: producto,
-  imagen: imagenUri,
-  ubicacion: ubicacion,
-});
-
-
-  await AsyncStorage.setItem('productos', JSON.stringify(productos));
-};
-
-
+    await AsyncStorage.setItem(
+      'productos',
+      JSON.stringify(productos)
+    );
+  };
 
   return (
-
     <View style={styles.container}>
-
       <Text style={styles.icon}>🛒</Text>
 
       <Text style={styles.title}>Agregar producto</Text>
@@ -98,49 +89,46 @@ productos.push({
       <Text style={styles.label}>Producto</Text>
 
       <TextInput
-  style={styles.input}
-  placeholder="Ej: Leche"
-  value={producto}
-  onChangeText={setProducto}
+        style={styles.input}
+        placeholder="Ej: Leche"
+        value={producto}
+        onChangeText={setProducto}
       />
 
-     <TouchableOpacity
-  style={styles.addButton}
-  onPress={handleAddProduct}
-     >
-  <Text style={styles.addButtonText}>
-    AGREGAR
-  </Text>
-  </TouchableOpacity>
+      <TouchableOpacity
+        style={styles.addButton}
+        onPress={handleAddProduct}
+      >
+        <Text style={styles.addButtonText}>
+          AGREGAR
+        </Text>
+      </TouchableOpacity>
 
+      <TouchableOpacity
+        style={styles.addButton}
+        onPress={seleccionarImagen}
+      >
+        <Text style={styles.addButtonText}>
+          🖼️ SELECCIONAR FOTO
+        </Text>
+      </TouchableOpacity>
 
-<TouchableOpacity
-  style={styles.addButton}
-  onPress={seleccionarImagen}
->
-  <Text style={styles.addButtonText}>
-    🖼️ SELECCIONAR FOTO
-  </Text>
-</TouchableOpacity>
+      <TouchableOpacity
+        style={styles.addButton}
+        onPress={obtenerUbicacion}
+      >
+        <Text style={styles.addButtonText}>
+          📍 OBTENER UBICACIÓN
+        </Text>
+      </TouchableOpacity>
 
-<TouchableOpacity
-  style={styles.addButton}
-  onPress={obtenerUbicacion}
->
-  <Text style={styles.addButtonText}>
-    📍 OBTENER UBICACIÓN
-  </Text>
-</TouchableOpacity>
-
-{ubicacion && (
-  <Text style={styles.locationText}>
-    📍 Latitud: {ubicacion.latitude}
-    {'\n'}
-    Longitud: {ubicacion.longitude}
-  </Text>
-)}
-
-
+      {ubicacion && (
+        <Text style={styles.locationText}>
+          📍 Latitud: {ubicacion.latitude}
+          {'\n'}
+          Longitud: {ubicacion.longitude}
+        </Text>
+      )}
 
       <Link href="/home" asChild>
         <TouchableOpacity>
@@ -149,7 +137,6 @@ productos.push({
           </Text>
         </TouchableOpacity>
       </Link>
-
     </View>
   );
 }
@@ -212,12 +199,12 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
   },
 
-locationText: {
-  marginTop: 12,
-  textAlign: 'center',
-  color: '#7A9B8A',
-  fontSize: 14,
-},
+  locationText: {
+    marginTop: 12,
+    textAlign: 'center',
+    color: '#7A9B8A',
+    fontSize: 14,
+  },
 
   backText: {
     textAlign: 'center',
@@ -226,4 +213,3 @@ locationText: {
     marginTop: 25,
   },
 });
-}
