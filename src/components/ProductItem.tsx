@@ -6,12 +6,10 @@ import {
   View,
 } from 'react-native';
 
-
 type ProductItemProps = {
   producto: string;
   imagen?: string | null;
   ubicacion?: {
-    contacto?: string | null;
     latitude: number;
     longitude: number;
   } | null;
@@ -29,74 +27,109 @@ export default function ProductItem({
   return (
     <View style={styles.productCard}>
 
+      <View style={styles.productInfo}>
 
-      {imagen && (
-    <Image
-      source={{ uri: imagen }}
-      style={styles.productImage}
-    />
-  )}
+        <View style={styles.topRow}>
 
-      <Text style={styles.productName}>
-        🛒 {producto}
-      </Text>
+          {imagen && (
+            <Image
+              source={{ uri: imagen }}
+              style={styles.productImage}
+            />
+          )}
 
-{ubicacion && (
-  <Text style={styles.locationText}>
-    📍 {ubicacion.latitude.toFixed(5)}, {ubicacion.longitude.toFixed(5)}
-  </Text>
-)}
+          <View style={styles.textContainer}>
+            <Text style={styles.productName}>
+              🛒 {producto}
+            </Text>
 
-{contacto && (
-  <Text style={styles.contactText}>
-    👤 Contacto: {contacto}
-  </Text>
-)}
+            {ubicacion && (
+              <Text style={styles.locationText}>
+                📍 {ubicacion.latitude.toFixed(5)},{' '}
+                {ubicacion.longitude.toFixed(5)}
+              </Text>
+            )}
 
-      <TouchableOpacity onPress={onDelete}>
+            {contacto && (
+              <Text style={styles.contactText}>
+                👤 Contacto: {contacto}
+              </Text>
+            )}
+          </View>
+
+        </View>
+
+      </View>
+
+      <TouchableOpacity
+        style={styles.deleteButtonContainer}
+        onPress={onDelete}
+      >
         <Text style={styles.deleteButton}>🗑</Text>
       </TouchableOpacity>
+
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-productImage: {
-  width: 60,
-  height: 60,
-  borderRadius: 10,
-  marginRight: 12,
-},
-
-locationText: {
-  fontSize: 12,
-  color: '#7A9B8A',
-  marginTop: 4,
-},
-
-
   productCard: {
     backgroundColor: '#FFFFFF',
-    padding: 16,
+    padding: 12,
     borderRadius: 12,
     marginBottom: 10,
     flexDirection: 'row',
-    justifyContent: 'space-between',
     alignItems: 'center',
+  },
+
+  productInfo: {
+    flex: 1,
+    minWidth: 0,
+  },
+
+  topRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+
+  productImage: {
+    width: 60,
+    height: 60,
+    borderRadius: 10,
+    marginRight: 12,
+  },
+
+  textContainer: {
+    flex: 1,
+    minWidth: 0,
   },
 
   productName: {
     fontSize: 16,
     color: '#444444',
+    marginBottom: 3,
   },
 
-  deleteButton: {
-    fontSize: 20,
+  locationText: {
+    fontSize: 12,
+    color: '#7A9B8A',
+    marginTop: 2,
   },
 
   contactText: {
-  fontSize: 12,
-  color: '#7A9B8A',
-  marginTop: 4,
-},
+    fontSize: 12,
+    color: '#7A9B8A',
+    marginTop: 2,
+  },
+
+  deleteButtonContainer: {
+    width: 42,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginLeft: 8,
+  },
+
+  deleteButton: {
+    fontSize: 22,
+  },
 });
