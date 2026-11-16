@@ -32,6 +32,7 @@ export default function HomeScreen() {
     latitude: number;
     longitude: number;
   } | null;
+  contacto: string | null;
 };
 
 
@@ -159,6 +160,7 @@ return (
   producto={producto.nombre}
   imagen={producto.imagen}
   ubicacion={producto.ubicacion}
+  contacto={producto.contacto}
         onDelete={() => {
           const indexOriginal = productos.indexOf(producto);
           handleDeleteProduct(indexOriginal);

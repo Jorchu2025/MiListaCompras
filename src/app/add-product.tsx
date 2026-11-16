@@ -1,4 +1,5 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import * as Contacts from 'expo-contacts/legacy';
 import * as ImagePicker from 'expo-image-picker';
 import * as Location from 'expo-location';
 import { Link } from 'expo-router';
@@ -19,6 +20,16 @@ export default function AddProductScreen() {
     latitude: number;
     longitude: number;
   } | null>(null);
+const [contacto, setContacto] = useState<string | null>(null);
+
+const [contactos, setContactos] = useState<
+  { id: string; name?: string | null }[]
+>([]);
+
+const [mostrarContactos, setMostrarContactos] = useState(false);
+
+
+
 
   const seleccionarImagen = async () => {
     const permiso =
@@ -56,6 +67,32 @@ export default function AddProductScreen() {
     });
   };
 
+  
+const seleccionarContacto = async () => {
+  alert('Entró a seleccionarContacto');
+  
+  const permiso = await Contacts.requestPermissionsAsync();
+
+  if (permiso.status !== 'granted') {
+    alert('Necesitamos permiso para acceder a tus contactos.');
+    return;
+  }
+
+  const respuesta = await Contacts.getContactsAsync({
+    fields: [Contacts.Fields.Name],
+  });
+
+  const contactosDisponibles = respuesta.data.map((item) => ({
+    id: item.id,
+    name: item.name,
+  }));
+
+  setContactos(contactosDisponibles);
+  setMostrarContactos(true);
+};
+
+
+
   const handleAddProduct = async () => {
     const productosGuardados =
       await AsyncStorage.getItem('productos');
@@ -68,6 +105,7 @@ export default function AddProductScreen() {
       nombre: producto,
       imagen: imagenUri,
       ubicacion: ubicacion,
+      contacto: contacto,
     });
 
     await AsyncStorage.setItem(
@@ -75,6 +113,7 @@ export default function AddProductScreen() {
       JSON.stringify(productos)
     );
   };
+
 
   return (
     <View style={styles.container}>
@@ -122,6 +161,39 @@ export default function AddProductScreen() {
         </Text>
       </TouchableOpacity>
 
+      <TouchableOpacity
+  style={styles.addButton}
+  onPress={seleccionarContacto}
+>
+  <Text style={styles.addButtonText}>
+    👤 SELECCIONAR CONTACTO
+  </Text>
+</TouchableOpacity>
+
+{mostrarContactos && (
+  <View style={styles.contactList}>
+    <Text style={styles.contactTitle}>
+      Seleccioná un contacto:
+    </Text>
+
+    {contactos.map((item) => (
+      <TouchableOpacity
+        key={item.id}
+        style={styles.contactItem}
+        onPress={() => {
+          setContacto(item.name ?? 'Contacto seleccionado');
+          setMostrarContactos(false);
+        }}
+      >
+        <Text style={styles.contactItemText}>
+          👤 {item.name ?? 'Sin nombre'}
+        </Text>
+      </TouchableOpacity>
+    ))}
+  </View>
+)}
+
+
       {ubicacion && (
         <Text style={styles.locationText}>
           📍 Latitud: {ubicacion.latitude}
@@ -129,6 +201,14 @@ export default function AddProductScreen() {
           Longitud: {ubicacion.longitude}
         </Text>
       )}
+
+{contacto && (
+  <Text style={styles.contactText}>
+    👤 Contacto: {contacto}
+  </Text>
+)}
+
+
 
       <Link href="/home" asChild>
         <TouchableOpacity>
@@ -212,4 +292,38 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     marginTop: 25,
   },
+
+contactText: {
+  marginTop: 12,
+  textAlign: 'center',
+  color: '#7A9B8A',
+  fontSize: 14,
+},
+
+contactList: {
+  marginTop: 12,
+  backgroundColor: '#FFFFFF',
+  borderRadius: 12,
+  padding: 10,
+},
+
+contactTitle: {
+  fontSize: 14,
+  fontWeight: 'bold',
+  color: '#8B5E65',
+  marginBottom: 8,
+},
+
+contactItem: {
+  padding: 10,
+  borderRadius: 8,
+  marginBottom: 6,
+  backgroundColor: '#F7F3F0',
+},
+
+contactItemText: {
+  fontSize: 14,
+  color: '#444444',
+},
+
 });

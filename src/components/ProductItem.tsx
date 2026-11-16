@@ -11,16 +11,19 @@ type ProductItemProps = {
   producto: string;
   imagen?: string | null;
   ubicacion?: {
+    contacto?: string | null;
     latitude: number;
     longitude: number;
   } | null;
   onDelete: () => void;
+  contacto?: string | null;
 };
 
 export default function ProductItem({
   producto,
   imagen,
   ubicacion,
+  contacto,
   onDelete,
 }: ProductItemProps) {
   return (
@@ -44,6 +47,11 @@ export default function ProductItem({
   </Text>
 )}
 
+{contacto && (
+  <Text style={styles.contactText}>
+    👤 Contacto: {contacto}
+  </Text>
+)}
 
       <TouchableOpacity onPress={onDelete}>
         <Text style={styles.deleteButton}>🗑</Text>
@@ -65,6 +73,8 @@ locationText: {
   color: '#7A9B8A',
   marginTop: 4,
 },
+
+
   productCard: {
     backgroundColor: '#FFFFFF',
     padding: 16,
@@ -83,4 +93,10 @@ locationText: {
   deleteButton: {
     fontSize: 20,
   },
+
+  contactText: {
+  fontSize: 12,
+  color: '#7A9B8A',
+  marginTop: 4,
+},
 });
