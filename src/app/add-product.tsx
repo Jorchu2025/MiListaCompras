@@ -1,4 +1,5 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import * as Calendar from 'expo-calendar/legacy';
 import * as Contacts from 'expo-contacts/legacy';
 import * as ImagePicker from 'expo-image-picker';
 import * as Location from 'expo-location';
@@ -91,6 +92,48 @@ const seleccionarContacto = async () => {
   setMostrarContactos(true);
 };
 
+const agregarAlCalendario = async () => {
+  if (!producto.trim()) {
+    alert('Primero ingresá un producto.');
+    return;
+  }
+
+  const permiso = await Calendar.requestCalendarPermissionsAsync();
+
+  if (permiso.status !== 'granted') {
+    alert('Necesitamos permiso para acceder al calendario.');
+    return;
+  }
+
+  const calendarios = await Calendar.getCalendarsAsync(
+    Calendar.EntityTypes.EVENT
+  );
+
+  const calendarioDisponible = calendarios.find(
+    (item) => item.allowsModifications
+  );
+
+  if (!calendarioDisponible) {
+    alert('No encontramos un calendario disponible para crear eventos.');
+    return;
+  }
+
+  const inicio = new Date();
+  inicio.setMinutes(inicio.getMinutes() + 5);
+
+  const fin = new Date(inicio.getTime() + 30 * 60 * 1000);
+
+  await Calendar.createEventAsync(calendarioDisponible.id, {
+    title: `🛒 Comprar ${producto}`,
+    startDate: inicio,
+    endDate: fin,
+    notes: `Recordatorio de compra para: ${producto}`,
+  });
+
+  alert('Evento agregado al calendario.');
+};
+
+
 
 
   const handleAddProduct = async () => {
@@ -160,6 +203,16 @@ const seleccionarContacto = async () => {
           📍 OBTENER UBICACIÓN
         </Text>
       </TouchableOpacity>
+
+<TouchableOpacity
+  style={styles.addButton}
+  onPress={agregarAlCalendario}
+>
+  <Text style={styles.addButtonText}>
+    📅 AGREGAR RECORDATORIO
+  </Text>
+</TouchableOpacity>
+
 
       <TouchableOpacity
   style={styles.addButton}

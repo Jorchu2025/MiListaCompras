@@ -11,15 +11,19 @@
       "icon": "./assets/expo.icon"
     },
     "android": {
-      "adaptiveIcon": {
-        "backgroundColor": "#E6F4FE",
-        "foregroundImage": "./assets/images/android-icon-foreground.png",
-        "backgroundImage": "./assets/images/android-icon-background.png",
-        "monochromeImage": "./assets/images/android-icon-monochrome.png"
-      },
-      "predictiveBackGestureEnabled": false,
-      "package": "com.anonymous.MiListaCompras"
-    },
+  "adaptiveIcon": {
+    "backgroundColor": "#E6F4FE",
+    "foregroundImage": "./assets/images/android-icon-foreground.png",
+    "backgroundImage": "./assets/images/android-icon-background.png",
+    "monochromeImage": "./assets/images/android-icon-monochrome.png"
+  },
+  "predictiveBackGestureEnabled": false,
+  "package": "com.anonymous.MiListaCompras",
+  "permissions": [
+    "android.permission.READ_CALENDAR",
+    "android.permission.WRITE_CALENDAR"
+  ]
+},
     "web": {
       "output": "static",
       "favicon": "./assets/images/favicon.png"
@@ -27,6 +31,7 @@
     "plugins": [
       "expo-notifications",
       "expo-contacts",
+      "expo-calendar",
       "expo-router",
       [
         "expo-splash-screen",
@@ -41,5 +46,9 @@
       "typedRoutes": true,
       "reactCompiler": true
     }
+
   }
+
 }
+
+
