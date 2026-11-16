@@ -3,6 +3,7 @@ import * as Notifications from 'expo-notifications';
 
 import { Link, useRouter } from 'expo-router';
 import { useEffect, useState } from 'react';
+
 import {
   Platform,
   StyleSheet,
@@ -12,6 +13,10 @@ import {
   View
 } from 'react-native';
 import ProductItem from '../components/ProductItem';
+
+import {
+  useProductStore
+} from '../store/productStore';
 
 
 Notifications.setNotificationHandler({
@@ -24,20 +29,21 @@ Notifications.setNotificationHandler({
 });
 
 export default function HomeScreen() {
-  const router = useRouter();
-  type Producto = {
-  nombre: string;
-  imagen: string | null;
-  ubicacion: {
-    latitude: number;
-    longitude: number;
-  } | null;
-  contacto: string | null;
-};
+const router = useRouter();
+  
+const productos = useProductStore(
+  (state) => state.productos
+);
+
+const cargarProductos = useProductStore(
+  (state) => state.cargarProductos
+);
+
+const eliminarProducto = useProductStore(
+  (state) => state.eliminarProducto
+);
 
 
-
-const [productos, setProductos] = useState<Producto[]>([]);
   const [busqueda, setBusqueda] = useState('');
 
 
@@ -96,38 +102,13 @@ const handleLogout = async () => {
 };
 
 
-    useEffect(() => {
-    const cargarProductos = async () => {
-      const productosGuardados = await AsyncStorage.getItem('productos');
+useEffect(() => {
+  cargarProductos();
+}, []);
 
-      if (productosGuardados) {
-  const datos = JSON.parse(productosGuardados);
-
-  const productosConvertidos = datos.map(
-    (producto: string | Producto) =>
-      typeof producto === 'string'
-        ? { nombre: producto, imagen: null }
-        : producto
-  );
-
-  setProductos(productosConvertidos);
-}
-    };
-
-    cargarProductos();
-  }, []);
   
   const handleDeleteProduct = async (index: number) => {
-  const nuevosProductos = productos.filter(
-    (_, i) => i !== index
-  );
-
-  setProductos(nuevosProductos);
-
-  await AsyncStorage.setItem(
-    'productos',
-    JSON.stringify(nuevosProductos)
-  );
+  await eliminarProducto(index);
 };
 
 const productosFiltrados = productos.filter((producto) =>

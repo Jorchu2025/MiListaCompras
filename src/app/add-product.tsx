@@ -1,4 +1,4 @@
-import AsyncStorage from '@react-native-async-storage/async-storage';
+
 import * as Calendar from 'expo-calendar/legacy';
 import * as Contacts from 'expo-contacts/legacy';
 import * as ImagePicker from 'expo-image-picker';
@@ -12,8 +12,12 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
+import { useProductStore } from '../store/productStore';
 
 export default function AddProductScreen() {
+  const agregarProducto = useProductStore(
+  (state) => state.agregarProducto
+);
   const [producto, setProducto] = useState('');
   const [imagenUri, setImagenUri] = useState<string | null>(null);
 
@@ -137,27 +141,15 @@ const agregarAlCalendario = async () => {
 
 
   const handleAddProduct = async () => {
-    const productosGuardados =
-      await AsyncStorage.getItem('productos');
+  await agregarProducto({
+    nombre: producto,
+    imagen: imagenUri,
+    ubicacion: ubicacion,
+    contacto: contacto,
+  });
+};
 
-    const productos = productosGuardados
-      ? JSON.parse(productosGuardados)
-      : [];
-
-    productos.push({
-      nombre: producto,
-      imagen: imagenUri,
-      ubicacion: ubicacion,
-      contacto: contacto,
-    });
-
-    await AsyncStorage.setItem(
-      'productos',
-      JSON.stringify(productos)
-    );
-  };
-
-
+  
   return (
     <View style={styles.container}>
       <Text style={styles.icon}>🛒</Text>

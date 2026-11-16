@@ -1,5 +1,7 @@
 import { fireEvent, render } from '@testing-library/react-native';
 import ProductItem from '../src/components/ProductItem';
+import { validarNombreProducto } from '../src/utils/productValidation';
+
 
 test('muestra el nombre del producto', async () => {
 
@@ -29,15 +31,10 @@ test('ejecuta onDelete al presionar eliminar', async () => {
   expect(onDelete).toHaveBeenCalled();
 });
 
-test('muestra correctamente otro producto', async () => {
-  const resultado = await render(
-    <ProductItem
-      producto="Arvejas"
-      onDelete={() => {}}
-    />
-  );
-
-  expect(resultado.getByText('🛒 Arvejas')).toBeTruthy();
+test('valida correctamente el nombre del producto', () => {
+  expect(validarNombreProducto('Leche')).toBe(true);
+  expect(validarNombreProducto('')).toBe(false);
+  expect(validarNombreProducto('   ')).toBe(false);
 });
 
 
