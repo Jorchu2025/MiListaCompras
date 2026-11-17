@@ -169,14 +169,7 @@ const agregarAlCalendario = async () => {
         onChangeText={setProducto}
       />
 
-      <TouchableOpacity
-        style={styles.addButton}
-        onPress={handleAddProduct}
-      >
-        <Text style={styles.addButtonText}>
-          AGREGAR
-        </Text>
-      </TouchableOpacity>
+  
 
       <TouchableOpacity
         style={styles.addButton}
@@ -253,6 +246,14 @@ const agregarAlCalendario = async () => {
   </Text>
 )}
 
+<TouchableOpacity
+  style={styles.addButton}
+  onPress={handleAddProduct}
+>
+  <Text style={styles.addButtonText}>
+    ✅ AGREGAR PRODUCTO
+  </Text>
+</TouchableOpacity>
 
 
       <Link href="/home" asChild>
